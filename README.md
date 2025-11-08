@@ -41,7 +41,7 @@ A TypeScript-based CLI tool that helps you easily switch between multiple GitHub
 ### Global Installation (Recommended)
 
 ```bash
-npm install -g @eshanrajapakshe/gh-switch
+npm install -g @eshan.rajapakshe/gh-switch
 ```
 
 ### Local Development
