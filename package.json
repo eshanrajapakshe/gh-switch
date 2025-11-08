@@ -1,0 +1,58 @@
+{
+  "name": "gh-switch",
+  "version": "1.0.0",
+  "description": "Intelligent CLI tool to seamlessly switch between multiple GitHub accounts with automatic SSH key management",
+  "main": "dist/index.js",
+  "bin": {
+    "gh-switch": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepare": "npm run build",
+    "start": "node dist/index.js"
+  },
+  "keywords": [
+    "github",
+    "git",
+    "cli",
+    "account-switcher",
+    "ssh",
+    "multi-account",
+    "ssh-keys",
+    "git-config",
+    "developer-tools",
+    "productivity",
+    "github-cli",
+    "account-management",
+    "ssh-keygen",
+    "typescript",
+    "cross-platform"
+  ],
+  "author": "Eshan Rajapakshe <eshan.r@aventude.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eshanrajapakshe/gh-switch.git"
+  },
+  "bugs": {
+    "url": "https://github.com/eshanrajapakshe/gh-switch/issues"
+  },
+  "homepage": "https://github.com/eshanrajapakshe/gh-switch#readme",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "fs-extra": "^11.2.0",
+    "inquirer": "^8.2.6",
+    "simple-git": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/inquirer": "^8.2.10",
+    "@types/node": "^20.11.5",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
