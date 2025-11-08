@@ -1,5 +1,5 @@
 {
-  "name": "gh-switch",
+  "name": "@eshanrajapakshe/gh-switch",
   "version": "1.0.0",
   "description": "Intelligent CLI tool to seamlessly switch between multiple GitHub accounts with automatic SSH key management",
   "main": "dist/index.js",
