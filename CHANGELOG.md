@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1] - 2025-11-22
+
+### Documentation
+- **Complete README Restructure**: Reorganized README with usage-first approach for better NPM package page experience
+  - **Usage Section**: Step-by-step guide now prominently featured as the main focus
+  - **Clearer Value Proposition**: Simplified introduction explaining what the tool does
+  - **Better Flow**: Restructured sections in order of importance (Installation → Usage → Commands → How It Works → Features)
+  - **Enhanced Step 4**: Added explicit clarification that cloned repositories automatically use the correct account for all future commits, pushes, and pulls
+  - **Improved Scannability**: Better section organization with clear visual separators
+  - **Command Reference**: Condensed command documentation for quick lookup
+  - **Simplified Troubleshooting**: More concise problem-solution format
+  - **User-Focused**: Optimized for users landing on NPM package page who want to quickly understand how to manage multiple GitHub accounts
+
+### Improved
+- Better explanation of automatic repository configuration after cloning
+- Clearer daily workflow examples
+- More concise feature descriptions
+
 ## [1.0.0] - 2025-11-08
 
 ### Added

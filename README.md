@@ -1,330 +1,376 @@
 # gh-switch
 
-A TypeScript-based CLI tool that helps you easily switch between multiple GitHub accounts on the same machine.
+**Seamlessly manage multiple GitHub accounts on the same machine.**
 
-## Features
+A simple CLI tool that lets you seamlessly manage multiple GitHub accounts on the same machine. Whether you switch between personal, work, and freelance profiles—or maintain several SSH keys—gh-switch handles the setup, switching, and cloning automatically.
 
-### 🎯 Smart Account Management
-- **Auto-Detection**: Detects existing Git configuration and SSH keys automatically
-- **Multi-Account Support**: Manage unlimited GitHub accounts (personal, work, client projects, etc.)
-- **Quick Switching**: Switch between accounts with a single command
-- **Active Profile Tracking**: Always know which account is currently active
-
-### 🔑 Intelligent SSH Key Management
-- **Duplicate Detection**: Automatically detects if an SSH key is already in use
-- **Auto-Generation**: Generates new SSH keys when duplicates are detected
-- **Key Display**: Shows generated public keys for easy copying to GitHub
-- **Smart Selection**: Presents available SSH keys as a list with visual indicators
-- **Secure Keys**: Uses Ed25519 algorithm (more secure than RSA)
-
-### 🚀 Seamless Git Operations
-- **Intelligent Cloning**: Clone repositories with the correct account credentials automatically
-- **Local Config**: Sets repository-specific git config for consistent commits
-- **SSH Config Management**: Automatically manages `~/.ssh/config` with host aliases
-- **URL Rewriting**: Transparently rewrites Git URLs to use correct SSH keys
-
-### ✨ Developer Experience
-- **Interactive Prompts**: User-friendly prompts with sensible defaults
-- **Visual Feedback**: Colored output with clear success/error messages
-- **Connection Verification**: Test SSH connections before using accounts
-- **Configuration Editing**: Easy access to view and edit configuration
-- **Cross-Platform**: Works on Windows, macOS, and Linux
-
-## Prerequisites
-
-- Node.js (v14 or higher)
-- Git installed and available in PATH
-- **No SSH keys required!** The tool can generate them for you
+Stop manually switching SSH keys and git configs. `gh-switch` lets you work with personal, work, and client GitHub accounts effortlessly—each with its own identity and SSH key.
 
 ## Installation
-
-### Global Installation (Recommended)
 
 ```bash
 npm install -g @eshan.rajapakshe/gh-switch
 ```
 
-### Local Development
+**Requirements:** Node.js (v14+) and Git. No SSH keys needed—the tool generates them for you!
 
-```bash
-# Clone the repository
-git clone <repo-url>
-cd gh-switch
+---
 
-# Install dependencies
-npm install
+## Usage
 
-# Build the project
-npm run build
-
-# Link globally for testing
-npm link
-```
-
-## Quick Start
-
-### 1. Initialize gh-switch
-
-Run the initialization wizard to add your first GitHub account:
+### Step 1: Set Up Your First Account
 
 ```bash
 gh-switch init
 ```
 
-The wizard will:
-- **Auto-detect** your current Git configuration (name and email)
-- **Scan** for SSH keys in your `~/.ssh/` directory
-- **Present** SSH keys as easy-to-select options
-- Guide you through providing a profile name and GitHub username
-- Set up everything automatically with smart defaults
+The interactive wizard will:
+- Auto-detect your current Git name and email
+- Scan for existing SSH keys in `~/.ssh/`
+- Let you choose an SSH key or generate a new one
+- Set up your first profile automatically
 
-### 2. Add Your Second Account
+**Example:**
+```
+? Profile name: personal
+? Git user name: John Doe
+? Git user email: john@personal.com
+? GitHub username: johndoe
+? Select SSH private key: id_ed25519_personal ✓
+```
+
+---
+
+### Step 2: Add More Accounts (Work, Client, etc.)
 
 ```bash
 gh-switch add
 ```
 
-**Smart SSH Key Handling:**
-- If you select an SSH key already used by another profile, the tool will detect it
-- It will offer to **automatically generate a new SSH key** for you
-- The public key will be displayed on screen for easy copying
-- Just add it to your GitHub account and you're done!
+Follow the same prompts. If you select an SSH key that's already in use, the tool will:
+- Detect the duplicate
+- Offer to generate a new SSH key automatically
+- Display the public key for you to copy to GitHub
 
-**Example flow:**
+**Example:**
 ```
-⚠️  This SSH key is already being used by the "work" profile.
-GitHub does not allow the same SSH key to be registered on multiple accounts.
+⚠️  This SSH key is already being used by the "personal" profile.
 
-? Would you like to generate a new SSH key for this profile? Yes
+? Would you like to generate a new SSH key? Yes
 
-🔑 Generating new SSH key...
+✅ SSH key generated: ~/.ssh/id_ed25519_work
 
-✅ SSH key generated successfully!
-
-📋 Copy the public key below and add it to your GitHub account:
-   GitHub → Settings → SSH and GPG keys → New SSH key
-
+📋 Copy this public key to GitHub → Settings → SSH and GPG keys:
 ────────────────────────────────────────────────
-ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... your-email@example.com
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... work@company.com
 ────────────────────────────────────────────────
+
+? Have you added the SSH key to your GitHub account? Yes
 ```
 
-### 3. Verify Connections
+---
 
-Test that your SSH connections to GitHub work:
+### Step 3: Switch Between Accounts
+
+```bash
+gh-switch use personal    # Switch to personal account
+gh-switch use work        # Switch to work account
+```
+
+This updates your global git config. All new commits will use the selected account's name and email.
+
+---
+
+### Step 4: Clone Repositories with the Right Account
+
+```bash
+# Clone with your work account
+gh-switch clone https://github.com/company/project.git work
+
+# Clone with your personal account
+gh-switch clone https://github.com/johndoe/my-app.git personal
+```
+
+**The cloned repository is automatically configured to use the specified account—no manual setup needed!**
+
+From this point onwards, **all commits, pushes, and pulls in that repository will automatically use the correct account**. You don't need to switch profiles or configure anything—just work normally:
+
+```bash
+cd project
+git add .
+git commit -m "Add feature"  # ✅ Commits as work account
+git push                      # ✅ Pushes with work SSH key
+```
+
+The repository "remembers" which account it belongs to!
+
+---
+
+### Step 5: Verify Everything Works
 
 ```bash
 gh-switch verify
 ```
 
-### 4. Switch Between Accounts
+This tests SSH connections for all your accounts:
 
-Activate a profile to set it as your global git configuration:
-
-```bash
-gh-switch use personal  # Switch to personal
-gh-switch use work      # Switch to work
-```
-
-### 5. Clone Repositories
-
-Clone a repository using a specific profile:
-
-```bash
-gh-switch clone https://github.com/username/repo.git personal
-```
-
-The repository will be automatically configured to use the correct account for all operations!
-
-## Commands
-
-### `gh-switch init`
-
-Initialize gh-switch and add your first account profile. This command:
-- **Auto-detects** existing Git configuration and uses it as defaults
-- **Scans** `~/.ssh/` directory for SSH keys and presents them as options
-- Creates the configuration directory (`~/.gh-switch/`)
-- Guides you through adding your first profile with smart defaults
-- Configures SSH settings automatically
-
-**Features:**
-- Git name and email are pre-filled from your current configuration
-- SSH keys are presented as a list to choose from
-- Keys with `.pub` files are marked for easy identification (✓)
-- Option to enter a custom SSH key path if needed
-
-### `gh-switch add`
-
-Add a new GitHub account profile interactively. Same smart features as `init`, plus:
-- **Duplicate SSH Key Detection**: Warns if you select a key already in use
-- **Automatic Key Generation**: Offers to generate a new SSH key
-- **Public Key Display**: Shows the generated key for easy copying to GitHub
-- **Guided Setup**: Waits for confirmation before proceeding
-
-**Example:**
-```bash
-gh-switch add
-```
-
-**When duplicate SSH key is detected:**
-```
-⚠️  This SSH key is already being used by the "work" profile.
-
-? Would you like to generate a new SSH key for this profile? (Y/n)
-
-✅ SSH key generated successfully!
-Private key: ~/.ssh/id_ed25519_personal
-Public key: ~/.ssh/id_ed25519_personal.pub
-
-📋 Copy the public key below and add it to your GitHub account:
-────────────────────────────────────────────────
-ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA...
-────────────────────────────────────────────────
-
-? Have you added the SSH key to your GitHub account? (y/N)
-```
-
-### `gh-switch list` (alias: `ls`)
-
-Display all configured profiles and highlight the currently active one.
-
-**Example:**
-```bash
-gh-switch list
-```
-
-**Output:**
-```
-📋 GitHub Account Profiles (2)
-
-● personal
-    GitHub: johndoe
-    Email: john@personal.com
-    SSH Host: github.com-personal
-    [ACTIVE]
-
-  work
-    GitHub: jdoe-company
-    Email: john@company.com
-    SSH Host: github.com-work
-```
-
-### `gh-switch use [profile]`
-
-Switch to a specific profile. This updates your global git configuration.
-
-**Example:**
-```bash
-gh-switch use work
-```
-
-If you don't specify a profile, you'll be prompted to select one.
-
-### `gh-switch current`
-
-Show the currently active profile and git configuration.
-
-**Example:**
-```bash
-gh-switch current
-```
-
-**Output:**
-```
-📌 Current Configuration
-
-Active Profile:
-  Name: personal
-  GitHub: johndoe
-  Email: john@personal.com
-  SSH Host: github.com-personal
-  SSH Key: /Users/john/.ssh/id_rsa_personal
-
-Global Git Config:
-  user.name: John Doe
-  user.email: john@personal.com
-```
-
-### `gh-switch clone <repo-url> [profile] [destination]`
-
-Clone a repository using a specific profile. The repository will be configured to use the profile's credentials locally.
-
-**Examples:**
-```bash
-# Clone with a specific profile
-gh-switch clone https://github.com/user/repo.git work
-
-# Clone to a specific directory
-gh-switch clone https://github.com/user/repo.git work my-project
-
-# Interactive selection if profile not specified
-gh-switch clone https://github.com/user/repo.git
-```
-
-The clone command:
-- Rewrites the repository URL to use the correct SSH host alias
-- Clones the repository
-- Sets local git config (user.name and user.email) for the repository
-
-### `gh-switch verify [profile]`
-
-Test SSH connection to GitHub for one or all profiles.
-
-**Examples:**
-```bash
-# Verify all profiles
-gh-switch verify
-
-# Verify specific profile
-gh-switch verify personal
-```
-
-**Output:**
 ```
 🔍 Verifying SSH connections to GitHub...
 
 Testing personal (johndoe)...
-  ✅ Success: Hi johndoe! You've successfully authenticated...
+  ✅ Success: Hi johndoe! You've successfully authenticated
 
 Testing work (jdoe-company)...
-  ✅ Success: Hi jdoe-company! You've successfully authenticated...
+  ✅ Success: Hi jdoe-company! You've successfully authenticated
 
 Summary:
   ✅ Successful: 2
   ❌ Failed: 0
 ```
 
-### `gh-switch remove [profile]` (alias: `rm`)
+---
 
-Remove a profile from gh-switch. You'll be asked to confirm before deletion.
+### Daily Workflow
 
-**Examples:**
+**Check which account is active:**
 ```bash
-# Remove a specific profile
-gh-switch remove old-account
+gh-switch current
+```
 
-# Interactive selection
-gh-switch remove
+**List all your accounts:**
+```bash
+gh-switch list
+```
+
+**Switch accounts:**
+```bash
+gh-switch use work
+cd work-project
+git commit -m "Add feature"  # Commits as work account
+git push
+```
+
+That's it! You're now managing multiple GitHub accounts effortlessly.
+
+---
+
+## Command Reference
+
+### `gh-switch init`
+Set up your first GitHub account profile.
+
+```bash
+gh-switch init
+```
+
+### `gh-switch add`
+Add another GitHub account (work, client, etc.).
+
+```bash
+gh-switch add
+```
+
+### `gh-switch use <profile>`
+Switch to a different account.
+
+```bash
+gh-switch use personal
+gh-switch use work
+```
+
+### `gh-switch clone <repo-url> <profile> [destination]`
+Clone a repository with a specific account.
+
+```bash
+gh-switch clone https://github.com/user/repo.git work
+gh-switch clone https://github.com/user/repo.git personal my-folder
+```
+
+### `gh-switch list` (alias: `ls`)
+Show all configured accounts.
+
+```bash
+gh-switch list
+```
+
+Output:
+```
+📋 GitHub Account Profiles (2)
+
+● personal
+    GitHub: johndoe
+    Email: john@personal.com
+    [ACTIVE]
+
+  work
+    GitHub: jdoe-company
+    Email: john@company.com
+```
+
+### `gh-switch current`
+Show the currently active account.
+
+```bash
+gh-switch current
+```
+
+### `gh-switch verify [profile]`
+Test SSH connections to GitHub.
+
+```bash
+gh-switch verify           # Test all accounts
+gh-switch verify personal  # Test specific account
+```
+
+### `gh-switch remove <profile>` (alias: `rm`)
+Remove an account profile.
+
+```bash
+gh-switch remove old-account
 ```
 
 ### `gh-switch config [--edit]`
+View or edit the configuration file.
 
-Show or edit the configuration file.
-
-**Examples:**
 ```bash
-# Display current configuration
-gh-switch config
-
-# Open configuration file in default editor
-gh-switch config --edit
+gh-switch config        # Display config
+gh-switch config --edit # Open in editor
 ```
 
-## Configuration
+---
 
-gh-switch stores its configuration in `~/.gh-switch/config.json`.
+## How It Works
 
-### Configuration Structure
+### The Problem
+GitHub doesn't allow the same SSH key on multiple accounts. If you have a personal and work account, you need different SSH keys and git configs for each.
+
+### The Solution
+`gh-switch` uses **SSH host aliases** to route different repositories through different SSH keys:
+
+1. **Each account gets a unique SSH host** (e.g., `github.com-personal`, `github.com-work`)
+2. **Your `~/.ssh/config` is automatically managed** with entries like:
+   ```
+   Host github.com-personal
+     HostName github.com
+     IdentityFile ~/.ssh/id_ed25519_personal
+
+   Host github.com-work
+     HostName github.com
+     IdentityFile ~/.ssh/id_ed25519_work
+   ```
+3. **When you clone with a profile**, the URL is rewritten to use the right host
+4. **Local git config is set** so commits use the correct name and email
+
+### What Happens When You Run Commands
+
+**`gh-switch use personal`**
+- Updates global git config: `user.name` and `user.email`
+- Sets `personal` as the active profile
+
+**`gh-switch clone <repo-url> work`**
+- Rewrites URL: `github.com` → `github.com-work`
+- Clones using the work account's SSH key
+- Sets local git config in the repo to use work credentials
+
+**Result:** Each repository automatically uses the correct account—no manual switching needed!
+
+---
+
+## Features
+
+### 🎯 Smart Account Management
+- **Auto-Detection**: Detects existing Git config and SSH keys
+- **Unlimited Accounts**: Manage personal, work, client accounts, etc.
+- **Quick Switching**: One command to switch accounts
+- **Active Profile Tracking**: Always know which account is active
+
+### 🔑 Intelligent SSH Key Management
+- **Duplicate Detection**: Warns if an SSH key is already in use
+- **Auto-Generation**: Generates new Ed25519 keys when needed
+- **Key Display**: Shows public keys for easy copying to GitHub
+- **Smart Selection**: Lists available SSH keys with visual indicators
+
+### 🚀 Seamless Git Operations
+- **Intelligent Cloning**: Clone repos with the right account automatically
+- **Local Config**: Sets repo-specific git config for consistent commits
+- **SSH Config Management**: Automatically manages `~/.ssh/config`
+- **URL Rewriting**: Transparently rewrites URLs to use correct SSH keys
+
+### ✨ Developer Experience
+- **Interactive Prompts**: User-friendly with sensible defaults
+- **Visual Feedback**: Colored output with clear messages
+- **Connection Verification**: Test SSH connections before using
+- **Cross-Platform**: Works on Windows, macOS, and Linux
+
+---
+
+## Troubleshooting
+
+### ❌ SSH Connection Failed
+
+**Run:**
+```bash
+gh-switch verify
+```
+
+**If it fails:**
+
+1. **Is your SSH key added to GitHub?**
+   - Go to GitHub → Settings → SSH and GPG keys
+   - Add your public key (displayed during `gh-switch add`)
+
+2. **Check SSH key permissions:**
+   ```bash
+   ls -l ~/.ssh/id_ed25519_*
+   ```
+   Private keys should be `600` or `400`
+
+3. **Test manually:**
+   ```bash
+   ssh -T git@github.com-personal
+   ```
+
+### ❌ Commits Show Wrong Author
+
+**Check which account is active:**
+```bash
+gh-switch current
+```
+
+**Switch to the correct account:**
+```bash
+gh-switch use work
+```
+
+**For existing repos, set local config:**
+```bash
+cd your-repo
+git config user.name "Your Name"
+git config user.email "your@email.com"
+```
+
+### ❌ Clone Failed
+
+1. **Verify SSH connection:**
+   ```bash
+   gh-switch verify work
+   ```
+
+2. **Check the profile exists:**
+   ```bash
+   gh-switch list
+   ```
+
+3. **Supported URL formats:**
+   - `https://github.com/user/repo.git`
+   - `git@github.com:user/repo.git`
+
+---
+
+## Configuration Files
+
+### `~/.gh-switch/config.json`
+Stores your account profiles:
 
 ```json
 {
@@ -334,7 +380,7 @@ gh-switch stores its configuration in `~/.gh-switch/config.json`.
       "gitName": "John Doe",
       "gitEmail": "john@personal.com",
       "githubUsername": "johndoe",
-      "sshKeyPath": "/Users/john/.ssh/id_rsa_personal",
+      "sshKeyPath": "/Users/john/.ssh/id_ed25519_personal",
       "sshHost": "github.com-personal"
     }
   ],
@@ -343,310 +389,91 @@ gh-switch stores its configuration in `~/.gh-switch/config.json`.
 }
 ```
 
-### SSH Configuration
-
-gh-switch automatically manages entries in your `~/.ssh/config` file. Managed entries are marked with comments:
+### `~/.ssh/config`
+Automatically managed SSH host aliases:
 
 ```
 # --- gh-switch managed entries START ---
 Host github.com-personal
   HostName github.com
   User git
-  IdentityFile /Users/john/.ssh/id_rsa_personal
+  IdentityFile /Users/john/.ssh/id_ed25519_personal
   IdentitiesOnly yes
 
 Host github.com-work
   HostName github.com
   User git
-  IdentityFile /Users/john/.ssh/id_rsa_work
+  IdentityFile /Users/john/.ssh/id_ed25519_work
   IdentitiesOnly yes
 # --- gh-switch managed entries END ---
 ```
 
-## Smart Auto-Detection
+---
 
-gh-switch makes setup easier by automatically detecting your existing configuration:
+## Advanced
 
-### Git Configuration Detection
+### Manual SSH Key Generation
 
-When you run `gh-switch init` or `gh-switch add`, the tool:
-- Reads your current global Git configuration (`git config --global user.name` and `user.email`)
-- Pre-fills these values as defaults in the interactive prompts
-- Saves you from typing information you've already configured
-- Allows you to override with different values if needed
-
-**Example:**
-```bash
-$ gh-switch add
-
-📋 Current Git configuration:
-  Name: John Doe
-  Email: john@personal.com
-  (You can use different values for this profile)
-
-? Git user name: (John Doe) ← Press Enter to use default or type a new value
-? Git user email: (john@personal.com) john@company.com ← Change for work account
-```
-
-### SSH Key Detection
-
-The tool automatically scans your `~/.ssh/` directory for SSH keys:
-- Detects common SSH key types (RSA, Ed25519, ECDSA, DSA)
-- Shows all available keys as a selectable list
-- Highlights keys that have corresponding `.pub` (public key) files
-- Prioritizes Ed25519 keys (more secure) over RSA keys
-- Provides an option to enter a custom path if needed
-
-**Detected Key Patterns:**
-- `id_rsa`, `id_rsa_*` (RSA keys)
-- `id_ed25519`, `id_ed25519_*` (Ed25519 keys - recommended)
-- `id_ecdsa`, `id_ecdsa_*` (ECDSA keys)
-- `id_dsa`, `id_dsa_*` (DSA keys)
-
-**Example:**
-```bash
-🔑 Found 3 SSH key(s) in ~/.ssh/
-
-? Select SSH private key: (Use arrow keys)
-❯ id_ed25519_personal ✓ (has .pub)
-  id_rsa_work ✓ (has .pub)
-  id_rsa ✓ (has .pub)
-  Enter custom path... ← Select this to enter a manual path
-```
-
-### Benefits
-
-This smart detection:
-- **Speeds up setup** - Less typing, fewer errors
-- **Prevents mistakes** - See what keys you actually have
-- **Improves UX** - Clear visual indicators (✓ for keys with .pub files)
-- **Maintains flexibility** - Can always override or enter custom values
-
-## How It Works
-
-### Account Switching
-
-When you run `gh-switch use <profile>`, the tool:
-1. Updates your global git config (`user.name` and `user.email`)
-2. Sets the profile as active in the configuration
-
-### Repository Cloning
-
-When you run `gh-switch clone <repo-url> <profile>`, the tool:
-1. Rewrites the repository URL to use the profile's SSH host alias
-2. Clones the repository using the rewritten URL
-3. Sets local git config in the cloned repository to use the profile's credentials
-
-This ensures that commits in that repository use the correct account.
-
-### SSH Host Aliases
-
-Each profile gets a unique SSH host alias (e.g., `github.com-personal`, `github.com-work`). This allows you to:
-- Use different SSH keys for different accounts
-- Clone repositories with specific accounts
-- Avoid SSH key conflicts
-
-## Common Workflows
-
-### Setting Up Multiple Accounts
-
-```bash
-# Initialize with your personal account
-gh-switch init
-
-# Add your work account
-gh-switch add
-
-# Verify both accounts
-gh-switch verify
-```
-
-### Working on Personal Projects
-
-```bash
-# Switch to personal account
-gh-switch use personal
-
-# Clone a personal repo
-gh-switch clone https://github.com/johndoe/my-project.git
-
-# Work on the project...
-cd my-project
-git add .
-git commit -m "Update feature"
-git push
-```
-
-### Working on Work Projects
-
-```bash
-# Switch to work account
-gh-switch use work
-
-# Clone a work repo
-gh-switch clone https://github.com/company/work-project.git
-
-# Work on the project...
-cd work-project
-git add .
-git commit -m "Implement feature"
-git push
-```
-
-### Checking Current Status
-
-```bash
-# See which account is active
-gh-switch current
-
-# List all accounts
-gh-switch list
-```
-
-## Troubleshooting
-
-### SSH Connection Failed
-
-If `gh-switch verify` fails:
-
-1. **Check if your SSH key is added to GitHub:**
-   - Go to GitHub Settings → SSH and GPG keys
-   - Add your public key if not present
-
-2. **Verify SSH key path:**
-   ```bash
-   gh-switch config
-   ```
-   Make sure the `sshKeyPath` is correct
-
-3. **Check SSH key permissions:**
-   ```bash
-   ls -l ~/.ssh/id_rsa_*
-   ```
-   Private keys should have permissions `600` or `400`
-
-4. **Test SSH manually:**
-   ```bash
-   ssh -T git@github.com-personal
-   ```
-
-### Git Commands Use Wrong Account
-
-If your commits show the wrong author:
-
-1. **Check active profile:**
-   ```bash
-   gh-switch current
-   ```
-
-2. **Switch to correct profile:**
-   ```bash
-   gh-switch use <correct-profile>
-   ```
-
-3. **For existing repositories, set local config:**
-   ```bash
-   cd your-repo
-   git config user.name "Your Name"
-   git config user.email "your@email.com"
-   ```
-
-### Clone Failed
-
-If `gh-switch clone` fails:
-
-1. **Verify SSH connection:**
-   ```bash
-   gh-switch verify <profile>
-   ```
-
-2. **Check repository URL format:**
-   - Supported: `https://github.com/user/repo.git`
-   - Supported: `git@github.com:user/repo.git`
-
-3. **Ensure profile exists:**
-   ```bash
-   gh-switch list
-   ```
-
-## SSH Key Generation
-
-If you need to generate SSH keys for your accounts:
-
-### Generate a new SSH key
+If you prefer to generate SSH keys manually:
 
 ```bash
 # For personal account
-ssh-keygen -t ed25519 -C "your-personal@email.com" -f ~/.ssh/id_ed25519_personal
+ssh-keygen -t ed25519 -C "personal@email.com" -f ~/.ssh/id_ed25519_personal
 
 # For work account
-ssh-keygen -t ed25519 -C "your-work@email.com" -f ~/.ssh/id_ed25519_work
+ssh-keygen -t ed25519 -C "work@email.com" -f ~/.ssh/id_ed25519_work
 ```
 
-### Add the public key to GitHub
-
+Then add the public key to GitHub:
 ```bash
-# Display your public key
 cat ~/.ssh/id_ed25519_personal.pub
-
-# Copy the output and add it to GitHub:
-# GitHub → Settings → SSH and GPG keys → New SSH key
+# Copy output to GitHub → Settings → SSH and GPG keys
 ```
 
-## Uninstallation
+### Uninstallation
 
 ```bash
-# Uninstall globally
-npm uninstall -g gh-switch
+npm uninstall -g @eshan.rajapakshe/gh-switch
 
-# Optionally remove configuration
+# Optionally remove config
 rm -rf ~/.gh-switch
 ```
 
-Note: Your `~/.ssh/config` file will retain the gh-switch managed entries. You can remove them manually if needed.
+Note: `~/.ssh/config` entries remain. Remove them manually if needed.
+
+---
 
 ## Development
+
+### Local Setup
+
+```bash
+git clone <repo-url>
+cd gh-switch
+npm install
+npm run build
+npm link
+```
 
 ### Project Structure
 
 ```
-gh-switch/
-├── src/
-│   ├── commands/        # Command implementations
-│   │   ├── add.ts
-│   │   ├── clone.ts
-│   │   ├── config.ts
-│   │   ├── current.ts
-│   │   ├── init.ts
-│   │   ├── list.ts
-│   │   ├── remove.ts
-│   │   ├── use.ts
-│   │   └── verify.ts
-│   ├── config/          # Configuration management
-│   │   └── config-manager.ts
-│   ├── types/           # TypeScript type definitions
-│   │   └── index.ts
-│   ├── utils/           # Utility functions
-│   │   ├── file-operations.ts
-│   │   ├── git-operations.ts
-│   │   └── ssh-config.ts
-│   └── index.ts         # CLI entry point
-├── package.json
-├── tsconfig.json
-└── README.md
+src/
+├── commands/        # Command implementations
+├── config/          # Configuration management
+├── types/           # TypeScript types
+├── utils/           # Utility functions
+└── index.ts         # CLI entry point
 ```
 
-### Building
+### Build & Test
 
 ```bash
-npm run build
+npm run build    # Compile TypeScript
+npm run dev      # Development mode
 ```
 
-### Development Mode
-
-```bash
-npm run dev
-```
+---
 
 ## License
 
@@ -654,8 +481,8 @@ MIT
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions welcome! Submit a Pull Request or open an issue.
 
 ## Support
 
-If you encounter any issues or have questions, please file an issue on the GitHub repository.
+Having issues? [Open an issue](https://github.com/your-repo/gh-switch/issues) on GitHub.
